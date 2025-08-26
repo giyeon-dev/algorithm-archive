@@ -12,4 +12,11 @@
 Auto-updated after merges to `main`.
 
 <!-- scoreboard:start -->
+### This Week: `2025-W35` (Goal: 3/person)
+
+| User | Solved | Commits | Checklist | Problems |
+|---|---:|---:|---|---|
+| giyeon | 0 | 0 | [ ][ ][ ] | — |
+| jieun | 0 | 0 | [ ][ ][ ] | — |
+
 <!-- scoreboard:end -->
