@@ -1,0 +1,47 @@
+name: Weekly Bootstrap (KST)
+
+on:
+  schedule:
+    # Every Sunday 15:01 UTC = Monday 00:01 KST
+    - cron: "1 15 * * 0"
+  workflow_dispatch:
+
+jobs:
+  create-week-folders:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: week
+        name: Compute KST ISO week folder
+        shell: bash
+        run: |
+          FOLDER=$(TZ=Asia/Seoul date +'%G-W%V')
+          echo "folder=$FOLDER" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare skeleton (only if missing)
+        shell: bash
+        run: |
+          set -e
+          FOLDER="${{ steps.week.outputs.folder }}"
+          CHANGED=0
+          for U in giyeon jieun; do   # ← 실제 폴더/사용자명으로
+            for P in leetcode baekjoon programmers; do
+              DIR="solutions/$U/$FOLDER/$P"
+              if [ ! -d "$DIR" ]; then
+                mkdir -p "$DIR"
+                : > "$DIR/.keep"   # scoreboard가 무시하는 자리표시자
+                CHANGED=1
+              fi
+            done
+          done
+          echo "CHANGED=$CHANGED" >> "$GITHUB_ENV"
+
+      - name: Commit skeleton (only when changed)
+        if: env.CHANGED == '1'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: bootstrap ${{ steps.week.outputs.folder }} [skip ci]"
+          file_pattern: solutions/**/.keep
